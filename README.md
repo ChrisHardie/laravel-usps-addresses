@@ -49,13 +49,23 @@ return [
 use UspsAddress;
 
 $result = UspsAddress::verify([
-    'streetAddress' => '1600 Pennsylvania Ave NW',
-    'city' => 'Washington',
-    'state' => 'DC',
+    'streetAddress' => '2704 Erie Ave',
+    'city' => 'Cincinnati',
+    'state' => 'OH',
 ]);
 
-$result->isValid();
+if ($result->isValid()) {
+    echo $result->address->streetAddress;
+};
 ```
+
+Methods available correspond to available API endpoints:
+
+* `UspsAddress::verify()`: Returns the best standardized address for a given address.
+* `UspsAddress::cityState()`: Returns the city and state for a given ZIP Code.
+* `UspsAddress::zipCode()`: Returns the ZIP Code for a given address.
+
+View the [USPS API documentation](https://developers.usps.com/addressesv3) for details about available parameters and responses.
 
 ## Testing
 
