@@ -13,6 +13,7 @@ class AddressResponseData extends Data
         public ?array $corrections,
         public ?array $matches,
         public ?array $warnings,
+        public ?array $error,
     ) {
     }
 
@@ -30,6 +31,10 @@ class AddressResponseData extends Data
 
     public function isValid(): bool
     {
+        if ($this->error) {
+            return false;
+        }
+
         if ($this->dpvConfirmed()) {
             return true;
         }

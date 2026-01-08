@@ -2,6 +2,8 @@
 
 namespace ChrisHardie\UspsAddresses;
 
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -24,13 +26,18 @@ class UspsClient
 
     protected function request(string $endpoint, array $query): array
     {
-        return Http::baseUrl(config('usps-addresses.base_url'))
+        $response = Http::baseUrl(config('usps-addresses.base_url'))
             ->withToken($this->token())
             ->acceptJson()
             ->timeout(config('usps-addresses.timeout'))
-            ->get($endpoint, $query)
-            ->throw()
-            ->json();
+            ->get($endpoint, $query);
+
+        if ($response->failed()) {
+            $errorBody = json_encode($response->json());
+            throw new \RuntimeException("USPS API Error {$response->status()}: {$errorBody}");
+        }
+
+        return $response->json();
     }
 
     public function address(array $data): array
