@@ -33,7 +33,15 @@ class UspsClient
             ->get($endpoint, $query);
 
         if ($response->failed()) {
-            $errorBody = json_encode($response->json());
+            $data = $response->json();
+
+            // Handle 404 (Not Found) or the specific 400 "Address Not Found" error code
+            $errorCode = $data['error']['errors'][0]['code'] ?? null;
+            if ($response->status() === 404 || ($response->status() === 400 && $errorCode === '010005')) {
+                return $data;
+            }
+
+            $errorBody = json_encode($data);
             throw new \RuntimeException("USPS API Error {$response->status()}: {$errorBody}");
         }
 
